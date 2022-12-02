@@ -15,6 +15,7 @@ levenshteinEditDistance = (req, res, next) => {
     storedPasswords.find().exec((err, rows) => {
         if (err) {
             console.log("Error");
+            return;
         }
         var lev = 0, pwords = 1;
         rows.forEach((p) => {
