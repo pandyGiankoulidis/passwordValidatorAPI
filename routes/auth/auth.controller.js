@@ -9,7 +9,7 @@ const sessions = require('express-session');
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-exports.signup = (req, res) =>{
+exports.signup = (req, res) => {
 
   const user = new User({
     username: req.body.username,
@@ -21,25 +21,30 @@ exports.signup = (req, res) =>{
     numbers: req.body.number,
     whiteSpacesTabs: req.body.spacestabs,
     incrementNumber: req.body.id,
-    critical:req.body.critical
+    critical: req.body.critical
   });
 
-  user.save((err,user)=>{
+  user.save((err, user) => {
     if (err) {
       res.status(500).send({ message: err });
       return;
     }
     res.send({ message: "Successfully stored preferences" });
   })
-  
+
 };
 
 exports.signin = (req, res) => {
+  if (!req.body.username || !req.body.password) {
+    res.status(200).send({ message: "Username and password are required fields for the body of this request." });
+    return;
+  }
+
   User.findOne({
     username: req.body.username
   })
     .exec((err, user) => {
-      
+
       if (err) {
         res.status(500).send({ message: err });
         return;
@@ -62,7 +67,7 @@ exports.signin = (req, res) => {
       });
 
       sessions.user = user;
-      
+
       res.status(200).send({
         id: user._id,
         username: user.username,

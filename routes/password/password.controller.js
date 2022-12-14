@@ -83,11 +83,26 @@ router.get('/validate', function (req, res, next) {
 
     const pword = new String(req.body.password);
     let i = 0, score = 0;
-    let number = 0, lowercase = 0, uppercase = 0, symbol = 0, tabsSpaces = 0;
+    let number = 0, lowercase = 0, uppercase = 0, symbol = 0, tabsSpaces = 0, nonspecial = 0;
 
     const operationsPerSecond = 38 * (10 ** 14);
 
     while (i < pword.length) {
+      /**
+           * Count the non-special characters before the loop.
+           * If the character at index i of the password does not belong to any of 
+           * the categories number,lowercase,uppercase or spacetab, than the summary 
+           * of the aforementioned char count occurances in the password 
+           * 
+           * number + lowercase + uppercase + tabsSpaces + symbol
+           * 
+           * shouldn't have been increased.
+           * 
+           * 
+           */
+      nonspecial = number + lowercase + uppercase + tabsSpaces + symbol;
+
+
       i++;
       /**
       * Perform string validation based on ascii numbers
@@ -99,7 +114,6 @@ router.get('/validate', function (req, res, next) {
       */
       if (("0".charCodeAt(0) <= pword.charCodeAt(i)) && (pword.charCodeAt(i) <= "9".charCodeAt(0))) {
         number = number + 1;
-        console.log("Found number {}", pword.charAt(i));
       }
 
       /**
@@ -107,7 +121,6 @@ router.get('/validate', function (req, res, next) {
       */
       if (("a".charCodeAt(0) <= pword.charCodeAt(i)) && (pword.charCodeAt(i) <= "z".charCodeAt(0))) {
         lowercase = lowercase + 1;
-        console.log("Found letter {}", pword.charAt(i));
       }
 
       /**
@@ -115,7 +128,6 @@ router.get('/validate', function (req, res, next) {
       */
       if (("A".charCodeAt(0) <= pword.charCodeAt(i)) && (pword.charCodeAt(i) <= "Z".charCodeAt(0))) {
         uppercase = uppercase + 1;
-        console.log("Found upper case letter {}", pword.charAt(i));
       }
 
       /**
@@ -123,15 +135,13 @@ router.get('/validate', function (req, res, next) {
       */
       if (pword.charCodeAt(i) == 32 || pword.charCodeAt(i) == 9) {
         tabsSpaces = tabsSpaces + 1;
-        console.log("Found Tabs and Spaces {}", pword.charAt(i));
       }
 
       /**
       * Case 5:Special symbol
       */
-      if (i > (number + lowercase + uppercase + tabsSpaces + symbol)) {
+      if (nonspecial == (number + lowercase + uppercase + tabsSpaces + symbol)) {
         symbol = symbol + 1;
-        console.log("Found Special character {}", pword.charAt(i));
       }
 
     }
@@ -302,15 +312,30 @@ router.get('/checkRequirements', function (req, res, next) {
       }
       if (req.body.password) {
         const pword = req.body.password;
-        let number = 0, lowercase = 0, uppercase = 0, symbol = 0, tabsSpaces = 0, i = 0;
+        let number = 0, lowercase = 0, uppercase = 0, symbol = 0, tabsSpaces = 0, nonspecial = 0, i = 0;
 
         while (i < pword.length) {
+
+          /**
+           * Count the non-special characters before the loop.
+           * If the character at index i of the password does not belong to any of 
+           * the categories number,lowercase,uppercase or spacetab, than the summary 
+           * of the aforementioned char count occurances in the password 
+           * 
+           * number + lowercase + uppercase + tabsSpaces + symbol
+           * 
+           * shouldn't have been increased.
+           * 
+           * 
+           */
+          nonspecial = number + lowercase + uppercase + tabsSpaces + symbol;
+
+
           /**
           * Case 1:Number
           */
           if (("0".charCodeAt(0) <= pword.charCodeAt(i)) && (pword.charCodeAt(i) <= "9".charCodeAt(0))) {
             number = number + 1;
-            console.log("Found number {}", pword.charAt(i));
           }
 
           /**
@@ -318,7 +343,6 @@ router.get('/checkRequirements', function (req, res, next) {
           */
           if (("a".charCodeAt(0) <= pword.charCodeAt(i)) && (pword.charCodeAt(i) <= "z".charCodeAt(0))) {
             lowercase = lowercase + 1;
-            console.log("Found letter {}", pword.charAt(i));
           }
 
           /**
@@ -326,7 +350,6 @@ router.get('/checkRequirements', function (req, res, next) {
           */
           if (("A".charCodeAt(0) <= pword.charCodeAt(i)) && (pword.charCodeAt(i) <= "Z".charCodeAt(0))) {
             uppercase = uppercase + 1;
-            console.log("Found upper case letter {}", pword.charAt(i));
           }
 
           /**
@@ -334,17 +357,15 @@ router.get('/checkRequirements', function (req, res, next) {
           */
           if (pword.charCodeAt(i) == 32 || pword.charCodeAt(i) == 9) {
             tabsSpaces = tabsSpaces + 1;
-            console.log("Found Tabs and Spaces {}", pword.charAt(i));
           }
 
           /**
           * Case 5:Special symbol
           */
-          if (i > (number + lowercase + uppercase + tabsSpaces + symbol)) {
+          if (nonspecial === (number + lowercase + uppercase + tabsSpaces + symbol)) {
             symbol = symbol + 1;
-            console.log("Found Special character {}", pword.charAt(i));
           }
-          i++;
+          i = i + 1;
         }
 
         let unevenLength = pref[0].length > pword.length;
