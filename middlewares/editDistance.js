@@ -12,20 +12,24 @@ const storedPasswords = db.storedPassword;
 
 levenshteinEditDistance = (req, res, next) => {
 
-    storedPasswords.find().exec((err, rows) => {
-        if (err) {
-            console.log("Error");
-            return;
-        }
-        var lev = 0, pwords = 1;
-        rows.forEach((p) => {
-            lev = lev + editDistance.levenshtein(req.body.password, p.password, insert, remove, update).distance;
-            pwords = pwords + 1;
+    if (req.body.password) {
+        storedPasswords.find().exec((err, rows) => {
+            if (err) {
+                console.log("Error");
+                return;
+            }
+            var lev = 0, pwords = 1;
+            rows.forEach((p) => {
+                lev = lev + editDistance.levenshtein(req.body.password, p.password, insert, remove, update).distance;
+                pwords = pwords + 1;
+            });
+
+            req.levenshteinDistance = lev / pwords;
+            next();
         });
-        console.log("Pwords = " + pwords + ", dist = " + lev)
-        req.levenshteinDistance = lev / pwords;
-        next();
-    });
+    } else {
+        res.status(200).send({ 'message': 'No password provided in the body request' });
+    }
 
 };
 
