@@ -4,6 +4,8 @@ var router = express.Router();
 const sessions = require('express-session');
 const db = require("../../models");
 const User = db.user;
+const url = require('url');
+
 
 class TimeStamp {
   constructor(duration) {
@@ -15,6 +17,10 @@ class TimeStamp {
     this._seconds = 0;
 
     while (duration > 0) {
+      if (duration > (31536000 * 1000000)) {
+        this._years = -1;
+        break;
+      }
       if (duration > 31536000) {
         this._years = this._years + 1;
         duration = duration - 31536000;
@@ -79,9 +85,12 @@ class TimeStamp {
 
 /*Routing functions */
 router.get('/validate', function (req, res, next) {
-  if (req.body.password) {
+  const queryObject = url.parse(req.url, true).query
 
-    const pword = new String(req.body.password);
+  if (queryObject.password) {
+
+    const pword = new String(queryObject.password);
+
     let i = 0, score = 0;
     let number = 0, lowercase = 0, uppercase = 0, symbol = 0, tabsSpaces = 0, nonspecial = 0;
 
@@ -145,7 +154,6 @@ router.get('/validate', function (req, res, next) {
       }
 
     }
-
     symbol = symbol - 1; //Remove the counting of the \n character
 
 
@@ -160,27 +168,24 @@ router.get('/validate', function (req, res, next) {
       permutations = permutations * (26 * uppercaseExists + 10 * numberExists + 26 * lowercaseExists + 64 * symbolExists + 2 * tabsExists);
     }
 
-
     const avgPermutations = permutations * 0.3465735;
 
     /* Time for brute force cracking without hashing */
     const UnhashedBestBruteForceCrackingTime = permutations / operationsPerSecond;
     const UnhashedAverageBruteForceCrackingTime = avgPermutations / operationsPerSecond;
-    console.log(permutations);
-    console.log(operationsPerSecond);
 
     /* Time for brute force generating hashes of passwords*/
-    const MD5hashTimePerMillionHashes = 627.4 * (10 ** (-3));
+    const MD5hashTimePerMillionHashes = 0.6274 * (10 ** (-3));
     const MD5BestCaseBruteForceTimeToCrack = (permutations * MD5hashTimePerMillionHashes) / (10 ** 6);
     const MD5AverageCaseBruteForceTimeToCrack = (avgPermutations * MD5hashTimePerMillionHashes) / (10 ** 6);
 
 
-    const SHA256hashTimePerMillionHashes = 737.8 * (10 ** (-3));
+    const SHA256hashTimePerMillionHashes = 0.7378 * (10 ** (-4));
     const SHA256BestCaseBruteForceTimeToCrack = (permutations * SHA256hashTimePerMillionHashes) / (10 ** 6);
     const SHA256AverageCaseBruteForceTimeToCrack = (avgPermutations * SHA256hashTimePerMillionHashes) / (10 ** 6);
 
 
-    const BCrypthashTimePerMillionHashes = 988 * (10 ** (-3));
+    const BCrypthashTimePerMillionHashes = 0.988 * (10 ** (-5));
     const BCryptBestCaseBruteForceTimeToCrack = (permutations * BCrypthashTimePerMillionHashes) / (10 ** 6);
     const BCryptAverageCaseBruteForceTimeToCrack = (avgPermutations * BCrypthashTimePerMillionHashes) / (10 ** 6);
 
@@ -194,11 +199,6 @@ router.get('/validate', function (req, res, next) {
     bcryptAvgTime = new TimeStamp(BCryptAverageCaseBruteForceTimeToCrack);
     bcryptBestTime = new TimeStamp(BCryptBestCaseBruteForceTimeToCrack);
 
-    /*console.log(req.levenshteinDist + " --- " + req.treeDist);
-
-    console.log("Found:length " + pword.length + " , uppercase:" + uppercase + ",lowercase:" + lowercase + ", symbol:" + symbol + ", digits:" + number + ", tabs:" + tabsSpaces);
-    console.log(uppercaseExists + " " + numberExists + " " + lowercaseExists + " " + symbolExists + " " + tabsExists);*/
-
     let strength = "Very Strong";
     if (UnhashedAverageBruteForceCrackingTime < 7200) {//less than two hours for cracking
       strength = "Very weak";
@@ -210,7 +210,7 @@ router.get('/validate', function (req, res, next) {
           strength = "Fair";
         } else {
           if (UnhashedAverageBruteForceCrackingTime < 2628000) {//less than a month to crack
-
+            strength = "Strong";
           }
         }
       }
@@ -219,7 +219,7 @@ router.get('/validate', function (req, res, next) {
     res.status(200).send({
       'UnhashedBruteForceCrackingTime': {
         'best_case': {
-          years: unhashedBestTime.years,
+          years: unhashedBestTime.years == -1 ? 'More than 1.000.000' : unhashedBestTime.years,
           months: unhashedBestTime.months,
           days: unhashedBestTime.days,
           hours: unhashedBestTime.hours,
@@ -227,7 +227,7 @@ router.get('/validate', function (req, res, next) {
           seconds: unhashedBestTime.seconds
         },
         'average_case': {
-          years: unhashedAvgTime.years,
+          years: unhashedAvgTime.years == -1 ? 'More than 1.000.000' : unhashedAvgTime.years,
           months: unhashedAvgTime.months,
           days: unhashedAvgTime.days,
           hours: unhashedAvgTime.hours,
@@ -237,7 +237,7 @@ router.get('/validate', function (req, res, next) {
       },
       'MD5bruteForceCrackingTime': {
         'best_case': {
-          years: md5BestTime.years,
+          years: md5BestTime.years == -1 ? 'More than 1.000.000' : md5BestTime.years,
           months: md5BestTime.months,
           days: md5BestTime.days,
           hours: md5BestTime.hours,
@@ -245,7 +245,7 @@ router.get('/validate', function (req, res, next) {
           seconds: md5BestTime.seconds
         },
         'average_case': {
-          years: md5AvgTime.years,
+          years: md5AvgTime.years == -1 ? 'More than 1.000.000' : md5AvgTime.years,
           months: md5AvgTime.months,
           days: md5AvgTime.days,
           hours: md5AvgTime.hours,
@@ -255,7 +255,7 @@ router.get('/validate', function (req, res, next) {
       },
       'SHA256bruteForceCrackingTime': {
         best_case: {
-          years: sha256BestTime.years,
+          years: sha256BestTime.years == -1 ? 'More than 1.000.000' : sha256BestTime.years,
           months: sha256BestTime.months,
           days: sha256BestTime.days,
           hours: sha256BestTime.hours,
@@ -263,7 +263,7 @@ router.get('/validate', function (req, res, next) {
           seconds: sha256BestTime.seconds
         },
         average_case: {
-          years: sha256AvgTime.years,
+          years: sha256AvgTime.years == -1 ? 'More than 1.000.000' : sha256AvgTime.years,
           months: sha256AvgTime.months,
           days: sha256AvgTime.days,
           hours: sha256AvgTime.hours,
@@ -273,7 +273,7 @@ router.get('/validate', function (req, res, next) {
       },
       'BCryptbruteForceCrackingTime': {
         best_case: {
-          years: bcryptBestTime.years,
+          years: bcryptBestTime.years == -1 ? 'More than 1.000.000' : bcryptBestTime.years,
           months: bcryptBestTime.months,
           days: bcryptBestTime.days,
           hours: bcryptBestTime.hours,
@@ -281,7 +281,7 @@ router.get('/validate', function (req, res, next) {
           seconds: bcryptBestTime.seconds
         },
         average_case: {
-          years: bcryptBestTime.years,
+          years: bcryptBestTime.years == -1 ? 'More than 1.000.000' : bcryptBestTime.years,
           months: bcryptBestTime.months,
           days: bcryptBestTime.days,
           hours: bcryptBestTime.hours,
