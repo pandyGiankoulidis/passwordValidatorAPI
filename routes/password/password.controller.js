@@ -310,8 +310,11 @@ router.get('/checkRequirements', function (req, res, next) {
       if (err) {
         res.status(500);
       }
-      if (req.body.password) {
-        const pword = req.body.password;
+
+      const queryObject = url.parse(req.url, true).query
+
+      if (queryObject.password) {
+        const pword = queryObject.password;
         let number = 0, lowercase = 0, uppercase = 0, symbol = 0, tabsSpaces = 0, nonspecial = 0, i = 0;
 
         while (i < pword.length) {
