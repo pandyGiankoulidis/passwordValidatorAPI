@@ -1,5 +1,7 @@
 module.exports = {
-    HOST: "localhost",
-    PORT: 27017,
-    DB: "apipassword"
-  };
+  HOST: "cluster0.mil8kb7.mongodb.net",
+  PORT: 27017,
+  DB: "test",
+  USERNAME: "admin02",
+  PASSWORD: "admin02"
+};

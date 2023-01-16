@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const dbConfig = require("./config/db.config");
 const database = require("./models");
 
-database.mongoose.connect(`mongodb+srv://admin:admin@cluster0.mil8kb7.mongodb.net/?retryWrites=true&w=majority`, {
+database.mongoose.connect(`mongodb+srv://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}`, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
