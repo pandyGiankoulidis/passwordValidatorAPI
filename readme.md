@@ -1,13 +1,16 @@
-The API offers two operations:
-a) Password strength validation
+
+#Password validator API
+ An API for validating the strength of a password and its compatibility to some predefined requirements. A running version of the API can be found in the project rapid API [repo](https://rapidapi.com/pantelisgiankoulidis/api/password-validator)
+This API offers two operations: \
+a) Password strength validation\
 b) Password preferences compatibility
 
 
-# Password strength validation
+## Password strength validation
 The password validation checks the given password's strength in brute force attacks. It calculates the password strength in such attacks, in cases the password is stored unhashed,or hashed with MD5,SHA256,MCrypt and BCrypt hashing.
 In our measures, a parallel GPU with 10^15 operations per second is considered
 
-## MD5 brute force cracking time
+### MD5 brute force cracking time
 MD5 is no longer considered a safe hashing for storing passwords.Although MD5 hashes are not convertible,modern computers can quickly generate billions of MD5 hashes from random words,
 therefore finding in reasonable time the password that generated a particular hash.Possible brute-force attacks from 
 these computers can crack an 8-characters password in a few minutes.\
@@ -24,7 +27,7 @@ brute force attacks in passwords stored after a MD5 hashing.An example responce 
         "seconds": 1.7276050285714286e-7
     },
 ~~~ 
-## SHA256 brute force cracking time
+### SHA256 brute force cracking time
 A better alternative for hashing is the SHA256 hash algorithm.
 ~~~
 "SHA256bruteForceCrackingTime": {
@@ -48,7 +51,7 @@ A better alternative for hashing is the SHA256 hash algorithm.
 ~~~
 
 
-## Bcrypt brute force cracking time
+### Bcrypt brute force cracking time
 A stronger option is the BCrypt hashing.
 ~~~
 "BCryptbruteForceCrackingTime": {
@@ -71,7 +74,7 @@ A stronger option is the BCrypt hashing.
     },
 ~~~
 
-## Popularity of password
+### Popularity of password
 We measure the average levenhstein distance from the given password to more than 1000 popular passwords
 ~~~
 "popularity": {
@@ -83,7 +86,7 @@ We measure the average levenhstein distance from the given password to more than
     }
 ~~~
 
-# Password preferences compatibility
+## Password preferences compatibility
 A user can store her password preferences, like length,uppercase letters etc. With the call "/pwordRequirements/checkRequirements?password=<password>" it returns whether the password meets the user's requirements or not.
 It uses Jwt authentication in nodejs to authenticate the user.
 ~~~
@@ -91,6 +94,8 @@ It uses Jwt authentication in nodejs to authenticate the user.
     "message": "Digits are fewer than required.There must be at least 2 digits"
 }
 ~~~
+
+
         
         
         
