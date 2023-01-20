@@ -1,6 +1,6 @@
 
 # Password validator API
- An API for validating the strength of a password and its compatibility to some predefined requirements. A running version of the API can be found in the project rapid API [repo](https://rapidapi.com/pantelisgiankoulidis/api/password-validator)
+ An API for validating the strength of a password and its compatibility to some predefined requirements. A running version of the API can be found in the project rapid API [repo](https://rapidapi.com/pantelisgiankoulidis/api/password-validator)\
 This API offers two operations: \
 a) Password strength validation\
 b) Password preferences compatibility
